@@ -349,6 +349,7 @@ void SpotMicroMotionCmd::readInConfigParameters() {
   pnh_.getParam("transit_tau", smnc_.transit_tau);
   pnh_.getParam("transit_rl", smnc_.transit_rl);
   pnh_.getParam("transit_angle_rl", smnc_.transit_angle_rl);
+  pnh_.param("sequential_stand", smnc_.sequential_stand, true);
   pnh_.getParam("dt", smnc_.dt);
   pnh_.getParam("debug_mode", smnc_.debug_mode);
   pnh_.getParam("run_standalone", smnc_.run_standalone);

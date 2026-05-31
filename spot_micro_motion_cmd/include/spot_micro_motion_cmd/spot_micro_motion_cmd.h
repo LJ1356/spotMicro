@@ -33,6 +33,7 @@ struct SpotMicroNodeConfig {
   float transit_tau;
   float transit_rl;
   float transit_angle_rl;
+  bool sequential_stand;
   bool debug_mode;
   bool run_standalone;
   bool plot_mode;
