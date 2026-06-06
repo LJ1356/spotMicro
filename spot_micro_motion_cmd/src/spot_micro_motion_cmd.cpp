@@ -59,10 +59,14 @@ SpotMicroMotionCmd::SpotMicroMotionCmd(ros::NodeHandle &nh, ros::NodeHandle &pnh
   robot_odometry_.euler_angs = {.phi = 0.0f, .theta = 0.0f, .psi = 0.0f};
   robot_odometry_.xyz_pos = {.x = 0.0f, .y = 0.0f, .z = 0.0f};
 
-  // Initialize servo array message with 12 servo objects
-  for (int i = 1; i <= smnc_.num_servos; i++) {
+  // Initialize servo array with one entry per joint; servo id comes from yaml num
+  // (may span multiple PCA9685 boards, e.g. 1-6 and 17-22).
+  for (std::map<std::string, std::map<std::string, float>>::iterator
+       iter = smnc_.servo_config.begin();
+       iter != smnc_.servo_config.end();
+       ++iter) {
     i2cpwm_board::Servo temp_servo;
-    temp_servo.servo = i;
+    temp_servo.servo = iter->second.at("num");
     temp_servo.value = 0;
     servo_array_.servos.push_back(temp_servo);
   }
@@ -241,6 +245,7 @@ void SpotMicroMotionCmd::setServoCommandMessageData() {
 
 
 void SpotMicroMotionCmd::publishServoProportionalCommand() {
+  int joint_index = 0;
   for (std::map<std::string, std::map<std::string, float>>::iterator
        iter = smnc_.servo_config.begin();
        iter != smnc_.servo_config.end();
@@ -266,8 +271,9 @@ void SpotMicroMotionCmd::publishServoProportionalCommand() {
       ROS_WARN("Joint %s, Angle: %1.2f", servo_name.c_str(), cmd_ang_rad*180.0/M_PI);
     }
  
-    servo_array_.servos[servo_num-1].servo = servo_num;
-    servo_array_.servos[servo_num-1].value = servo_proportional_cmd; 
+    servo_array_.servos[joint_index].servo = servo_num;
+    servo_array_.servos[joint_index].value = servo_proportional_cmd;
+    joint_index++;
  }
 
  // Publish message
