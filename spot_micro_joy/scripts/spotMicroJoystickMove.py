@@ -11,7 +11,7 @@ from math import pi
 class SpotMicroJoystickControl():
     BUTTON_IDLE = 0
     BUTTON_WALK = 1
-    BUTTON_STAND = 2
+    BUTTON_STAND = 4
     BUTTON_ANGLE = 3
 
     ANGLE_AXES_ROLL = 0
