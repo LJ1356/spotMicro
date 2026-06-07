@@ -520,6 +520,10 @@ static void _set_active_board (int board)
 
             // the first time we activate a board, we mark it and set all of its servo channels to 0
             _set_pwm_interval_all (0, 0);
+
+            // Apply the global PWM frequency to this board so all boards share
+            // the same frequency without needing a manual set_pwm_frequency call.
+            _set_pwm_frequency (_pwm_frequency);
         }
     }
 }
@@ -1448,7 +1452,18 @@ static int _load_params (void)
 	nhp.param ("pwm_frequency", pwm, 50);
 	_set_pwm_frequency (pwm);
 
-	
+	// Initialize all boards (default 2) with the same PWM frequency so that
+	// servos on any board behave correctly from the first command without
+	// requiring a manual set_pwm_frequency call after startup.
+	// Override with ROS param ~num_boards if more than 2 boards are used.
+	int num_boards;
+	nhp.param ("num_boards", num_boards, 2);
+	for (int b = 2; b <= num_boards; b++) {
+		_set_active_board (b);
+		_set_pwm_frequency (pwm);
+	}
+	_set_active_board (1);   // restore default active board
+
 	/*
 	  // note: servos are numbered sequntially with '1' being the first servo on board #1, '17' is the first servo on board #2
 
